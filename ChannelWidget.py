@@ -126,8 +126,10 @@ class ChannelWidget(tk.Frame):
 
     def resetData(self):
         self.after_cancel(self.loop)
-        timeData = []
-        tempData = []
+        self.timeData = []
+        self.tempData = []
+
+        self.plot.drawLine(0, self.timeData, self.tempData)
         
         self.plot.axes.set_xlim(0, 10)
         self.plot.axes.set_ylim(10, 40)
@@ -143,8 +145,6 @@ class ChannelWidget(tk.Frame):
 
             file.close()
 
-            self.after_cancel(self.loop)
-            timeData = []
-            tempData = []
+            self.resetData()
         
 
