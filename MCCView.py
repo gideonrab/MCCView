@@ -22,6 +22,8 @@ class Application(tk.Tk):
 
         self.grid_columnconfigure(0, weight=1)
 
+        self.addChannel()
+
     def addChannel(self):
         channel = ChannelWidget(self)
         self.channels.add(channel)

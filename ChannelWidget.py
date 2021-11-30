@@ -58,8 +58,10 @@ class ChannelWidget(tk.Frame):
         self.plot = PlotContainer(self)
         self.plot.grid(row=3, column=0, columnspan = self.grid_size()[0], sticky="NESW")
 
-        self.plot.axes.set_xlabel("Temperature (C)")
-        self.plot.axes.set_ylabel("Time (s)")
+        self.plot.axes.set_ylabel("Temperature (C)")
+        self.plot.axes.set_xlabel("Time (s)")
+        self.plot.axes.set_xlim(0, 10)
+        self.plot.axes.set_ylim(10, 40)
 
         self.plot.addLine()
 
@@ -76,16 +78,30 @@ class ChannelWidget(tk.Frame):
         tempDatum = self.DAQ.getTemperature()
         timeDatum = time.time() - self.startTime
 
-        print(tempDatum)
-
         if tempDatum == self.tempData[-1]:
-            self.loop = self.after(100, self.recordData)
-        else:
-            self.timeData.append(timeDatum)
-            self.tempData.append(tempDatum)
-            self.loop = self.after(500, self.recordData)
-            self.plot.drawLine(0, self.timeData, self.tempData)
+            self.loop = self.after(50, self.recordData)
+            return
 
+        self.loop = self.after(500, self.recordData)
+        self.addDatum(timeDatum, tempDatum)
+        
+    
+    def addDatum(self, timeDatum, tempDatum):
+        self.timeData.append(timeDatum)
+        self.tempData.append(tempDatum)
+
+        self.plot.drawLine(0, self.timeData, self.tempData)
+
+        xlim = self.plot.axes.get_xlim()
+        ylim = self.plot.axes.get_ylim()
+
+        if timeDatum > xlim[1]:
+            self.plot.axes.set_xlim(0, xlim[1]+10)
+        
+        if tempDatum > ylim[1]:
+            self.plot.axes.set_ylim(ylim[0], ylim[1]+10)
+        elif tempDatum < ylim[0]:
+            self.plot.axes.set_ylim(ylim[0]-10, ylim[1])
 
 
     def startRecording(self):
@@ -98,11 +114,10 @@ class ChannelWidget(tk.Frame):
 
             if len(self.timeData) == 0 :
                 self.startTime = time.time()
-
-            self.tempData.append(temp)
-            self.timeData.append(0)
-
+            
             self.loop = self.after(500, self.recordData)
+
+            self.addDatum(time.time() - self.startTime, temp)
         except:
             messagebox.showwarning("Invalid Device or Channel", "Hey, you!\nPlease check the device and channel # imputs. Apparently they're not valid")
 
@@ -113,12 +128,15 @@ class ChannelWidget(tk.Frame):
         self.after_cancel(self.loop)
         timeData = []
         tempData = []
+        
+        self.plot.axes.set_xlim(0, 10)
+        self.plot.axes.set_ylim(10, 40)
 
     def exportData(self):
-        file = asksaveasfile(initialfile = 'Untitled.txt', defaultextension=".txt",filetypes=[("All Files","*.*"),("Text Documents","*.txt")])
+        file = asksaveasfile(initialfile = 'Untitled.csv', defaultextension=".csv",filetypes=[("All Files","*.*"),("CSV Documents","*.csv")])
 
         if file != None:
-            CSV = csv.writer(file)
+            CSV = csv.writer(file, lineterminator = '\n')
 
             CSV.writerow(["Time", "Temperature"])
             CSV.writerows(zip(self.timeData, self.tempData))

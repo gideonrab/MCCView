@@ -27,7 +27,7 @@ class PlotContainer(tk.Frame):
         self.canvas.draw()
 
     def addLine(self):
-        self.axes.plot([], [])
+        self.axes.plot([], [], "rd")
     
     def drawLine(self, index, xData, yData):
         self.axes.lines[index].set_xdata(xData)
