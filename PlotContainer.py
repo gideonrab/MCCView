@@ -27,14 +27,12 @@ class PlotContainer(tk.Frame):
         self.canvas.draw()
 
     def addLine(self):
-        self.axes.plot([], [], "rd")
+        self.axes.plot([], [], "d")
     
     def drawLine(self, index, xData, yData):
         self.axes.lines[index].set_xdata(xData)
         self.axes.lines[index].set_ydata(yData)
         self.canvas.draw()
 
-    def removeLlot(self, index):
-        self.axes.lines.remove(index)
-        self.canvas.draw()
-    
+    def legend(self, labels):
+        self.axes.legend(labels)
