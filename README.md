@@ -1,6 +1,6 @@
 # MCCView
 
-Just Labview but better.
+Shows plots like labview, but without labview.
 
 Only works for thermocouples at the moment.
 
